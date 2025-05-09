@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pandas = "*"
+dash = "*"
+numpy = "*"
+prophet = "*"
+scikit-learn = "*"
+dash-bootstrap-components = "*"
+
+[dev-packages]
+black = "*"
+pymongo = "*"
+
+[requires]
+python_version = "3.10"

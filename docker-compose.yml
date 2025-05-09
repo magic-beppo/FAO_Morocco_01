@@ -1,0 +1,27 @@
+services:
+  morocco-balances:
+
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: ${GOOGLE_APPLICATION_CREDENTIALS_JSON}
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    networks:
+      - traefik
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.morocco-balances.tls=true"
+      - "traefik.http.routers.morocco-balances.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.morocco-balances.entrypoints=websecure"
+      - "traefik.http.routers.service=morocco-balances-service"
+      - "traefik.http.services.morocco-balances-service.loadbalancer.server.port=8050"
+      - "traefik.docker.network=traefik"
+
+      - "traefik.http.routers.morocco-balances.rule=Host(`morocco-balances.fsobs.org`)"
+
+networks:
+  traefik:
+    external: true
