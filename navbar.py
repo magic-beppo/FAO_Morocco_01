@@ -1,38 +1,49 @@
+# navbar.py
+import os
 from dash import dcc, html
 
+# 1) Which deployment are we in?
+#    ➤ On Railway:   DEPLOYMENT=railway
+#    ➤ On AWS:       DEPLOYMENT=aws
+#    ➤ Locally:      defaults to "aws"
+DEPLOYMENT = os.getenv("DEPLOYMENT", "aws").lower()
+
+# 2) id → (icon class, label, railway-slug, aws-slug)
+ROUTES = {
+    "home-link":      ("fas fa-home",       "Home",           "morocco-menu",         "morocco-home"),
+    "Macro1":         ("fas fa-chart-line", "Macro-WEO",      "faomorocco8",          "morocco-imf-macro"),
+    "Macro2":         ("fas fa-chart-line", "Macro-FAO",      "faomorocco12",         "morocco-macro-fao"),
+    "SOI":            ("fas fa-chart-line", "FS Indicators",  "faomorocco2",          "morocco-fs"),
+    "SUA":            ("fas fa-database",   "SUA Balances",   "psdmorocco",           "morocco-balances"),
+    "Trade Analyst":  ("fas fa-database",   "Trade Analyst",  "faomorocco3",          "morocco-trade-analyst"),
+    "Tracker":        ("fas fa-database",   "Trade Tracker",  "faomorocco4",          "morocco-food-tracker"),
+    "FIB":            ("fas fa-database",   "Food Import Bill","faomorocco5",         "morocco-fibs"),
+    "Precipitation1": ("fas fa-database",   "Virtual Water",  "faomorocco6",          "morocco-virtual-water"),
+    "Precipitation2": ("fas fa-database",   "Precipitation",  "faomorocco9",          "morocco-precipitation"),
+    "Diversity":      ("fas fa-database",   "Crop Diversity", "faomorocco10",         "morocco-distributions"),
+    "Fertilizer":     ("fas fa-database",   "Fertilizer",     "faomorocco11",         "morocco-fertilizer"),
+}
 
 def Navbar():
-    return html.Nav(
-        className="navbar",
-        children=[
-            dcc.Location(id='url', refresh=False),
-            
-            html.A([html.I(className="fas fa-home"), " Home"], href="https://morocco-menu-production.up.railway.app/", id='home-link', className="nav-link"),
-            
-            html.A([html.I(className="fas fa-chart-line"), "Macro-WEO"], href="https://faomorocco8-production.up.railway.app/", id='Macro1', className="nav-link"),
+    links = [ dcc.Location(id="url", refresh=False) ]
 
-            html.A([html.I(className="fas fa-chart-line"), "Macro-FAO"], href="https://faomorocco12-production.up.railway.app", id='Macro2', className="nav-link"),
-            
-            html.A([html.I(className="fas fa-chart-line"), "FS Indicators"], href="https://faomorocco2-production.up.railway.app/", id='SOI', className="nav-link"),
-            
-            html.A([html.I(className="fas fa-database"), " SUA Balances"], href="https://psdmorocco-production.up.railway.app/", id='SUA', className="nav-link"),
-            
-            html.A([html.I(className="fas fa-database"), " Trade Analyst"], href="https://faomorocco3-production.up.railway.app/", id='Trade Analyst', className="nav-link"),
-            
-            html.A([html.I(className="fas fa-database"), " Trade Tracker"], href="https://faomorocco4-production.up.railway.app/", id='Tracker', className="nav-link"),
-            
-            html.A([html.I(className="fas fa-database"), " Food Import Bill"], href="https://faomorocco5-production.up.railway.app/", id='FIB', className="nav-link"),
-            
-            html.A([html.I(className="fas fa-database"), " Virtual Water"], href="https://faomorocco6-production.up.railway.app/", id='Precipitation1', className="nav-link"),
+    for _id, (icon, label, slug_r, slug_a) in ROUTES.items():
+        if DEPLOYMENT == "railway":
+            domain = f"{slug_r}-production.up.railway.app"
+        else:  # aws
+            # skip any entry without an AWS slug
+            if not slug_a:
+                continue
+            domain = f"{slug_a}.fsobs.org"
 
-            html.A([html.I(className="fas fa-database"), " Precipitation"], href="https://faomorocco9-production.up.railway.app//", id='Precipitation2', className="nav-link"),
-            
-            html.A([html.I(className="fas fa-database"), " Crop Diversity"], href="https://faomorocco10-production.up.railway.app/", id='Diversity', className="nav-link"),
-            
-            html.A([html.I(className="fas fa-database"), " Fertilizer"], href="https://faomorocco11-production.up.railway.app/", id='Fertilizer', className="nav-link"),
-            
-            html.A([html.I(className="fas fa-database"), " GAEZ"], href="https://faomorocco11-production.up.railway.app/", id='GAEZ', className="nav-link"),
-            
-        ],
-    )
+        href = f"https://{domain}/"
+        links.append(
+            html.A(
+                [ html.I(className=icon), f" {label}" ],
+                href=href,
+                id=_id,
+                className="nav-link"
+            )
+        )
 
+    return html.Nav(className="navbar", children=links)
